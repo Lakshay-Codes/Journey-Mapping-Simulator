@@ -1,7 +1,7 @@
 
 
 # Journey Mapping Simulator 🗺️
-
+Deployment Link : https://journey-mapping-simulator-lakshayni09.netlify.app/
 A web-based pathfinding visualization tool that demonstrates various graph traversal algorithms including Depth-First Search, Breadth-First Search, and Dijkstra's algorithm. Users can interactively create mazes, place start/end points, and visualize how different pathfinding algorithms work.
 
 
