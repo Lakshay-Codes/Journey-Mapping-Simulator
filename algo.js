@@ -8,7 +8,7 @@ let row, col;
 let pixelSize = 40;
 let start_Coordinate;
 let end_Coordinate;
-let algorithm = 'Depth-First-Search';
+let algorithm = 'Depth-First-Search-Recursive';
 const board = document.getElementById('board');
 const runBtn = document.getElementById('visualize');
 const removePath = document.getElementById('clearPath');
@@ -17,6 +17,16 @@ const navOptions = document.querySelectorAll('.nav-menu>li>a');
 const generateMazeBtn = document.getElementById('generateMazeBtn');
 
 GenBoard();
+
+removePath.addEventListener('click', clearPath);
+clearMaze.addEventListener('click', clearBoard);
+
+generateMazeBtn.addEventListener('click', () => {
+    wallToAnimation = [];
+    clearBoard();
+    generateMaze(0, row - 1, 0, col - 1, false, 'horizontal');
+    Animation(wallToAnimation, 'wall');
+})
 
 runBtn.addEventListener('click', () => {
     clearPath();
@@ -29,8 +39,11 @@ runBtn.addEventListener('click', () => {
         case 'Dijkstra':
             Dijsktra();
             break;
-        case 'Depth-First-Search':
-            DFS();
+        case 'Depth-First-Search-Recursive':
+            DFS_Recursive();
+            break;
+        case 'Depth-First-Search-Iterative':
+            DFS_Iterative();
             break;
         default:
             break;
@@ -103,8 +116,43 @@ function BFS() {
 }
 
 
-//Depth-First-Search Algorithm 
-function DFS() {
+//Depth-First-Search Algorithm Recusive 
+function DFS_Recursive(current = start_Coordinate, visited = new Set(), parent = new Map()) {
+    const key = `${current.x}-${current.y}`;
+    visited.add(key);
+    visitedCell.push(matrix[current.x][current.y]);
+
+    if (current.x === end_Coordinate.x && current.y === end_Coordinate.y) {
+        getPath(parent, end_Coordinate);
+        return true;
+    }
+
+    const neighbours = [
+        { x: current.x - 1, y: current.y },
+        { x: current.x + 1, y: current.y }, 
+        { x: current.x, y: current.y + 1 },
+        { x: current.x, y: current.y - 1 }
+    ];
+
+    for (const neighbour of neighbours) {
+        const neighbourKey = `${neighbour.x}-${neighbour.y}`;
+
+        if (IsInBound(neighbour.x, neighbour.y) &&
+            !visited.has(neighbourKey) &&
+            !matrix[neighbour.x][neighbour.y].classList.contains('wall')
+        ) {
+            parent.set(neighbourKey, current);
+            if (DFS_Recursive(neighbour, visited, parent)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+//Depth-First-Search Algorithm Iterative 
+function DFS_Iterative() {
     const stack = [];
     const visited = new Set();
     const parent = new Map();
@@ -142,7 +190,6 @@ function DFS() {
         }
     }
 }
-
 
 // Dijsktra's Algorithm 
 class PQ {
@@ -246,17 +293,6 @@ function Dijsktra() {
         }
     }
 }
-
-
-removePath.addEventListener('click', clearPath);
-clearMaze.addEventListener('click', clearBoard);
-
-generateMazeBtn.addEventListener('click', () => {
-    wallToAnimation = [];
-    clearBoard();
-    generateMaze(0, row - 1, 0, col - 1, false, 'horizontal');
-    Animation(wallToAnimation, 'wall');
-})
 
 function generateMaze(rowStart, rowEnd, colStart, colEnd, surroundingWall, orientation) {
     if (rowStart > rowEnd || colStart > colEnd) {
